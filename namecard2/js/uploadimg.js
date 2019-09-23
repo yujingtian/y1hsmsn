@@ -1,0 +1,6 @@
+
+function uploadimg(params,callback) {
+
+
+};
+

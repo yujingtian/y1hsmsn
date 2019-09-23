@@ -1,0 +1,411 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>浙商银行</title>
+    <meta name="viewport" content="width=device-width,minimum-scale=1.0,maximum-scale=1.0,user-scalable=no"/>
+    <!--删除苹果默认的工具栏和菜单栏-->
+    <meta name="apple-mobile-web-app-capable" context="yes">
+    <!--设置苹果工具栏颜色-->
+    <meta name="apple-mobile-web-app-status-bar-style" context="black">
+    <!--忽略页面中的数字识别为电话-->
+    <meta name="format-detection" context="telephone=no,email=no">
+    <link href='./css/index5.css' rel='stylesheet' type='text/css' />
+
+</head>
+<body id="body">
+<div id="page1" class="page1">
+    <div class="page1-a">
+        <span id="imgBtn" class="imgBtn"></span>
+        <canvas class="c1" id="c1"></canvas>
+        <div class="divc1" id="divc1"></div>
+        <span id="addImg" style="color:#898989;text-align: center;">点击添加图片</span>
+    </div>
+
+    <div class="page1-b">
+        <input id="username" type="text" name="" placeholder="请输入姓名">
+        <input style="margin-top:2px;" id="phone" type="number" name="" placeholder="请输入手机号码">
+    </div>
+
+    <div class="showImgBtn" id="showImgBtn">生成图片</div>
+    <div style="text-align: center;margin-top: 3px;">注：如不添加照片，默认为模板图片</div>
+</div>
+
+<div id="page2" class="page2">
+    <canvas id="c2" style="display: none;"> </canvas>
+    <div id="low-source"></div>
+    <div id="footerbox" style="display: none;">
+        <div id="page2-a" class="page2-a">
+            <div id="page2-a-title" class="page2-a-title">
+                <div class="">
+                    <span>客户经理:</span>
+                    <input id="username2" type="text" name="">
+                </div>
+                <div>
+                    <span>联系号码:</span>
+                    <input id="phone2" type="number" name="">
+                </div>
+            </div>
+        </div>
+
+    </div>
+    <div id="page2-b" class="page2-b">
+        <span id="restartBtn">重新上传</span>
+        <span id="shareBtn">确认分享</span>
+    </div>
+</div>
+
+<div class="tishi" id="tishi" >
+    长按保存图片至相册<br>分享至朋友圈
+</div>
+
+<input type="file" id="upfile" accept="image/*" style="display:none;" />
+
+
+
+<script type="text/javascript" src="http://code.jquery.com/jquery-2.0.0.min.js"></script>
+<script src="./js/alloy_paper2.js"></script>
+<script src="./js/alloy_finger2.js"></script>
+<script src="./js/hidpi-canvas.min.js"></script>
+<script src="./js/common.js"></script>
+<script>
+    var cardbgsrc = './img/card-5.png';
+    document.querySelector('#username').scrollIntoView();
+    document.querySelector('#phone').scrollIntoView();
+    document.querySelector('#username2').scrollIntoView();
+    document.querySelector('#phone2').scrollIntoView();
+
+    var $username = $("#username"),
+        $username2 = $("#username2"),
+        $phone =  $("#phone"),
+        $phone2 =  $("#phone2"),
+        $restartBtn = $("#restartBtn"),
+        $shareBtn = $("#shareBtn"),
+        $footerbox = $("#footerbox"),
+        tishi = document.getElementById('tishi'),
+        $page2= $("#page2"),
+        $page2atitle = $("#page2-a-title"),
+        $lowSource = $("#low-source");
+
+    var w = window.screen.width,
+        h = window.screen.height;
+    console.log('w',w,'h',h)
+    var c1 = document.getElementById("c1");
+    var c2 = document.getElementById("c2");
+    var ctx1 = c1.getContext("2d");
+    var ctx2 = c2.getContext("2d");
+    var divc1 = $("#divc1");
+
+    var getPixelRatio = function(context) {
+        var backingStore = context.backingStorePixelRatio ||
+            context.webkitBackingStorePixelRatio ||
+            context.mozBackingStorePixelRatio ||
+            context.msBackingStorePixelRatio ||
+            context.oBackingStorePixelRatio ||
+            context.backingStorePixelRatio || 1;
+
+        return (window.devicePixelRatio || 1) / backingStore;
+    };
+    var ratio = getPixelRatio(ctx2);
+    var PHOTOSIZE =  cilpPhoto(1,w,h)
+
+    c2.style.width = w+'px';
+    c2.style.height= h+'px';
+    c1.style.width = PHOTOSIZE.width+'px';
+    c1.style.height= PHOTOSIZE.height+'px';
+    c1.width =PHOTOSIZE.width
+    c1.height = PHOTOSIZE.height
+    c2.width = w*ratio;
+    c2.height = h*ratio;
+    console.log('w',w,'h',h,'ratio',ratio);
+    divc1.width(PHOTOSIZE.width).height(PHOTOSIZE.height);
+
+    $("#username,#username2").keyup(function() {
+
+        var flag = /^[\u0391-\uFFE5A-Za-z.]{1,11}$/g.test($(this).val().replace(/\s/g,''));//只能输入数字
+        if(!flag) {
+            this.value = this.value.replace(/[\d]/g,"");
+            var val = this.value;
+            var  that = this;
+            val.replace(/(.{0,12})/,function(a){
+                that.value = a;
+            })
+        }
+
+    });
+    //手机号码
+    $("#phone,#phone2").keyup(function() {
+
+        var flag = regexps.mobileOrTel.test($(this).val().replace(/\s/g,''));//只能输入数字
+        var that = this;
+        if(!flag){
+            this.value = this.value.replace(/[^\d]/g,"");
+            var val = this.value;
+
+            val.replace(/^(\d{1,14})/,function(str,a){
+                that.value = a;
+            })
+        }
+
+
+    });
+
+    function getObjectURL(file) {
+        var url = null ;
+        if (window.createObjectURL!=undefined) { // basic
+            url = window.createObjectURL(file) ;
+        } else if (window.URL!=undefined) { // mozilla(firefox)
+            url = window.URL.createObjectURL(file) ;
+        } else if (window.webkitURL!=undefined) { // webkit or chrome
+            url = window.webkitURL.createObjectURL(file) ;
+        }
+        return url ;
+    }
+    $('#imgBtn,#divc1').on('click',function(){
+        $('#upfile').trigger('click');
+    });
+
+    handlefile()
+
+    //上传图片裁切尺寸
+    function cilpPhoto(num,w,h) {
+        var obj ={}
+        switch (num){
+            case 1:
+                obj = {
+                    width:w*0.58,
+                    height:w*0.58*1.595
+                }
+                break;
+        }
+        return obj;
+    }
+
+    //画图
+    function card(ctx,w,h,obj,callback){
+        ctx.clearRect(0,0,c2.width,c2.height);
+
+        ctx.beginPath();
+        ctx.rect(0,0,c2.width,c2.height);
+        ctx.fillStyle="white";
+        ctx.fill();
+        ctx.closePath();
+
+        photoimgCanvas(ctx,obj,callback)
+    }
+
+    //footer-1
+    function cssFooter1(){
+
+    }
+
+    //dingwei
+    function getdingwei(c1){
+        var  ctxW = c1.width,
+            ctxH= c1.height,
+            x = c2.width-c1.width,
+            y = c2.height*0.327;
+        var obj = {
+            x:x,
+            y:y,
+            w:ctxW,
+            h:ctxH
+        }
+        commonData.photoWZ =  Object.assign({},obj)
+        return obj;
+    }
+
+    function getdingwei2(c1){
+        var footerW = w;
+        var x = 0
+        var y = h*0.822;
+        var obj = {
+            x:x,
+            y:y,
+            w:footerW,
+            h:footerW*0.26
+        }
+        commonData.footerWZ =  Object.assign({},obj)
+        return obj;
+    }
+
+
+
+    //输入内容
+    function getinput(){
+        var username = $username.val();
+        var phone = $phone.val();
+        $username2.val(username)
+        $phone2.val(phone)
+       if(!username){
+           alert('姓名不能为空');
+           return false;
+       }
+       if(!phone){
+           alert('联系方式不能为空');
+            return false;
+       }
+       if(!regexps.mobileOrTel.test(phone)){
+            alert('联系方式格式不正确');
+            return false;
+       }
+
+        return true;
+
+    }
+
+    function card2(y) {//1
+        ctx2.clearRect(0,0,c2.width,c2.height);
+
+        ctx2.beginPath();
+        ctx2.rect(0,0,c2.width,c2.height);
+        ctx2.fillStyle="white";
+        ctx2.fill();
+        ctx2.closePath();
+        ctx1.save();
+        var img = new Image();
+        img.onload = function () {
+            c1.width=c1.width*ratio;
+            c1.height = c1.height*ratio;
+            ctx1.drawImage(img,0,0,c1.width,c1.height)
+            ctx1.restore();
+            ctx2.clearRect(c2.width-c1.width,c2.height-c1.height-h*0.106*ratio,c1.width,c1.height)
+            ctx2.drawImage(c1,c2.width-c1.width,c2.height-c1.height-h*0.106*ratio,c1.width,c1.height)
+            var img2 = new Image();
+            img2.onload = function(){
+                ctx2.save();
+                ctx2.drawImage(img2,0,0,c2.width,c2.width*1.786);
+                ctx2.restore();
+
+            }
+            img2.src='./img/card-5.png'
+
+        }
+        img.src = './img/initphoto5.png'
+    }
+
+
+
+
+    $('#showImgBtn').on('click',function(){//点击生成
+        if(!getinput()) return;
+        $('#page1').hide();
+        $("#page2").show();
+        var obj = getdingwei(c1);
+        if($('#upfile').get(0).files.length==0){
+             cardbgsrc = './img/card-55.png';
+
+        } else {
+             cardbgsrc = './img/card-5.png';
+        }
+        obj.y = c2.height-obj.h-h*0.106*ratio-1
+        card(ctx2,w,h,obj,function () {
+            footertxtCanvas(ctx2)
+            generateImg()
+        });
+
+    });
+
+
+    $restartBtn.click(function(){
+        $("#page2").hide();
+        $("#page1").show();
+    })
+
+
+    $shareBtn.click(function(){
+        $("#page2-b").hide();
+        $lowSource.css({
+            width:'100%',
+            padding:'0'
+        }).children('img').css({
+            width:'100%',
+            border:'none'
+        })
+        tishifn("长按保存图片至相册<br>分享至朋友圈");
+    })
+
+
+    //huatuphotoimg
+    function photoimgCanvas(ctx,obj,callback){
+        ctx.drawImage(c1,obj.x,obj.y,obj.w,obj.h)
+        var img = new Image();
+        img.onload = function(){
+            ctx.save();
+            ctx.drawImage(img,0,0,c2.width,c2.width*1.786);
+            ctx.restore();
+            if(callback){
+                callback(ctx)
+            }
+
+        }
+        img.src=cardbgsrc
+    }
+
+    function footertxtCanvas(ctx) {//写字
+        ctx.save();
+        ctx.beginPath();
+        var recth =h*0.106;
+        ctx.rect(0,h-recth,w,recth);
+        ctx.fillStyle="#e40012";
+        ctx.fill();
+        ctx.closePath();
+        ctx.restore();
+        var namex = 30;
+        var phonex = w/2;
+        var y = (h-recth)+(recth/2)+8
+        var nameval = commonData.name+$username2.val();
+        var phoneval = commonData.phone+$phone2.val()
+        ctx.beginPath();
+        ctx.font= commonData.fontSize1+"px normal Microsoft YaHei";
+        ctx.fillStyle = "#fff";
+        ctx.fillText(nameval,namex,y);
+        ctx.fillText(phoneval,phonex,y);
+        ctx.closePath();
+    }
+
+    tishi.addEventListener('touchstart',function (e) {
+        console.log(e);
+        tishi.style.top = '-100px';
+        tishi.style.display='none';
+    });
+
+    function generateImg() {// 生成名片
+        var image = new Image();
+        image.onload=function(){
+            image.width = w;
+            image.height = h;
+            c2.style.display = 'none';
+            image.addEventListener('touchstart',function (e) {
+                console.log(e);
+                tishihide()
+            })
+            $lowSource.html(image);
+            // uploadimg('接口地址',$username2.val())//上传图片
+
+        }
+        image.src = c2.toDataURL("image/png");
+
+    }
+
+    function tishifn(txt) {//
+        tishi.style.display='block';
+        tishi.style.top=(h/2)+'px';
+        $(tishi).html(txt)
+    }
+
+    function tishihide(){
+        tishi.style.top = '-100px';
+        tishi.style.display='none';
+    }
+    tishifn("提示:<br>上传图片可以用手势控制大小旋转");
+
+    setTimeout(function () {
+        tishihide()
+    },3000)
+
+
+
+</script>
+</body>
+</html>

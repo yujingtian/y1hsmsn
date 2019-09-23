@@ -1,0 +1,437 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <title>浙商银行</title>
+  <meta name="viewport" content="width=device-width,minimum-scale=1.0,maximum-scale=1.0,user-scalable=no"/>
+  <!--删除苹果默认的工具栏和菜单栏-->
+  <meta name="apple-mobile-web-app-capable" context="yes">
+  <!--设置苹果工具栏颜色-->
+  <meta name="apple-mobile-web-app-status-bar-style" context="black">
+  <!--忽略页面中的数字识别为电话-->
+  <meta name="format-detection" context="telephone=no,email=no">
+  <link href='./css/index2.css' rel='stylesheet' type='text/css' />
+    <script src="js/common.js"></script>
+
+</head>
+<body id="body">
+<div id="page1" class="page1">
+  <div class="page1-a">
+    <span id="imgBtn" class="imgBtn"></span>
+    <canvas class="c1" id="c1"></canvas>
+    <div class="divc1" id="divc1"></div>
+    <span id="addImg" style="color:#898989;text-align: center;margin-top: 0px;">点击添加图片</span>
+  </div>
+
+  <div class="page1-b">
+        <input id="username" type="text" name="" placeholder="请输入姓名">   
+        <input style="margin-top:8px;" id="phone" type="number" name="" placeholder="请输入手机号码"> 
+  </div>
+
+  <div class="showImgBtn" id="showImgBtn">生成图片</div>
+    <div style="text-align: center;margin-top: 3px;">注：如不添加照片，默认为模板图片</div>
+</div>
+
+<div id="page2" class="page2">
+    <canvas id="c2" style="display: none;"> </canvas>
+    <div id="low-source"></div>
+    <div id="page2-main" style="display: none;">
+        <div class="page2-con">
+            <div class="page2-headbox"><img src="./img/header2.png" alt=""></div>
+            <div id="page2-footer" class="page2-footer">
+                <img src="./img/footer2-1.png" alt="">
+                <div id="photobox" class="photobox"></div>
+            </div>
+        </div>
+        <div id="footerbox" >
+            <div id="page2-a" class="page2-a">
+                <div class="page2-a-title">
+                    <div class="">
+                        <span>客户经理:</span>
+                        <input id="username2" type="text" name="">
+                    </div>
+                    <div>
+                        <span>联系号码:</span>
+                        <input id="phone2" type="number" name="">
+                    </div>
+                </div>
+            </div>
+
+        </div>
+
+    </div>
+    <div id="page2-b" class="page2-b">
+        <span id="restartBtn">重新上传</span>
+        <span id="shareBtn">确认分享</span>
+    </div>
+</div>
+
+<div class="tishi" id="tishi" >
+        长按保存图片至相册<br>分享至朋友圈
+</div>
+
+<input type="file" id="upfile" accept="image/*" style="display:none;" />
+
+
+<script type="text/javascript" src="http://code.jquery.com/jquery-2.0.0.min.js"></script>
+<script src="./js/alloy_paper2.js"></script>
+<script src="./js/alloy_finger2.js"></script>
+<script src="./js/hidpi-canvas.min.js"></script>
+<script src="./js/common.js"></script>
+<script>
+
+    document.querySelector('#username').scrollIntoView();
+    document.querySelector('#phone').scrollIntoView();
+    document.querySelector('#username2').scrollIntoView();
+    document.querySelector('#phone2').scrollIntoView();
+
+    var $username = $("#username"),
+        $username2 = $("#username2"),
+        $phone =  $("#phone"),
+        $phone2 =  $("#phone2"),
+        $restartBtn = $("#restartBtn"),
+        $shareBtn = $("#shareBtn"),
+        $footerbox = $("#footerbox"),
+        tishi = document.getElementById('tishi'),
+        $page2= $("#page2"),
+        $photobox = $("#photobox"),
+        $lowSource = $("#low-source");
+    var w = window.screen.width,
+        h = window.screen.height;
+    console.log('w',w,'h',h)
+    var c1 = document.getElementById("c1");
+    var c2 = document.getElementById("c2");
+    var ctx1 = c1.getContext("2d");
+    var ctx2 = c2.getContext("2d");
+    var divc1 = $("#divc1");
+
+
+
+    var getPixelRatio = function(context) {
+        var backingStore = context.backingStorePixelRatio ||
+            context.webkitBackingStorePixelRatio ||
+            context.mozBackingStorePixelRatio ||
+            context.msBackingStorePixelRatio ||
+            context.oBackingStorePixelRatio ||
+            context.backingStorePixelRatio || 1;
+
+        return (window.devicePixelRatio || 1) / backingStore;
+    };
+
+    var PHOTOSIZE =  cilpPhoto(1,w,h)
+    var ratio = getPixelRatio(ctx2);
+
+    c2.style.width = w+'px';
+    c2.style.height= h+'px';
+    c1.style.width = PHOTOSIZE.width+'px';
+    c1.style.height= PHOTOSIZE.height+'px';
+    c1.width =PHOTOSIZE.width//*ratio;
+    c1.height = PHOTOSIZE.height//*ratio;
+    c2.width = w*ratio;
+    c2.height = h*ratio;
+    divc1.width(PHOTOSIZE.width).height(PHOTOSIZE.height);
+
+    //圆角矩形
+    CanvasRenderingContext2D.prototype.roundRect = function (x, y, w, h, r) {
+        var min_size = Math.min(w, h);
+        if (r > min_size / 2) r = min_size / 2;
+        // 开始绘制
+        this.beginPath();
+        this.moveTo(x + r, y);
+        this.arcTo(x + w, y, x + w, y + h, r);
+        this.arcTo(x + w, y + h, x, y + h, r);
+        this.arcTo(x, y + h, x, y, r);
+        this.arcTo(x, y, x + w, y, r);
+        this.closePath();
+        return this;
+    }
+
+    $("#username,#username2").keyup(function() {
+
+        var flag = /^[\u0391-\uFFE5A-Za-z.]{1,11}$/g.test($(this).val().replace(/\s/g,''));//只能输入数字
+        if(!flag) {
+            this.value = this.value.replace(/[\d]/g,"");
+            var val = this.value;
+            var  that = this;
+            val.replace(/(.{0,12})/,function(a){
+                that.value = a;
+            })
+        } 
+       
+    });
+    //手机号码
+    $("#phone,#phone2").keyup(function() {
+
+        var flag = regexps.mobileOrTel.test($(this).val().replace(/\s/g,''));//只能输入数字
+        var that = this;
+        if(!flag){
+            this.value = this.value.replace(/[^\d]/g,"");
+            var val = this.value;
+
+            val.replace(/^(\d{1,14})/,function(str,a){
+                that.value = a;
+            })
+        }
+
+
+    });
+
+    function getObjectURL(file) {
+        var url = null ;
+        if (window.createObjectURL!=undefined) { // basic
+            url = window.createObjectURL(file) ;
+        } else if (window.URL!=undefined) { // mozilla(firefox)
+            url = window.URL.createObjectURL(file) ;
+        } else if (window.webkitURL!=undefined) { // webkit or chrome
+            url = window.webkitURL.createObjectURL(file) ;
+        }
+        return url ;
+    }
+    $('#imgBtn,#divc1').on('click',function(){
+        $('#upfile').trigger('click');
+    });
+
+ handlefile()
+
+    //上传图片裁切尺寸
+  function cilpPhoto(num,w,h) {
+      var obj ={}
+      switch (num){
+          case 1:
+              var width = w*0.478
+              obj = {
+                width:width,
+                height:width*1.515
+              }
+           break;
+      }
+      commonData.photo = obj;
+      return obj;
+  }
+
+  //画图
+   function card(ctx,w,h){
+       ctx.clearRect(0,0,c2.width,c2.height);
+
+       ctx.beginPath();
+       ctx.rect(0,0,c2.width,c2.height);
+       ctx.fillStyle="white";
+       ctx.fill();
+       ctx.closePath();
+      
+         var img = new Image();    
+         img.onload = function(){
+             ctx.save();
+             ctx.drawImage(img,0,0,c2.width,c2.width*1.786);
+             ctx.restore();
+             footerimgCanvas(ctx)
+         } 
+         img.src='./img/card-2.png'
+        
+   }
+
+   //footer-1
+   function cssFooter1(){
+       $photobox.children().remove();
+       var widthbg = w-(w*0.13);//bg w
+       var offset = widthbg*0.03;
+       var left =(w*0.13)+widthbg/2-offset-(commonData.photo.width/2)
+       commonData.photo.x = left;
+
+       var img  = new Image();
+       img.onload = function () {
+           $photobox.css({
+               left:left+'px'
+           }).width(img.width/ratio)
+           $photobox.get(0).appendChild(img);
+
+       }
+
+       img.src = c1.toDataURL("image/png");
+
+   }
+
+   //dingwei
+   function getdingwei(c1){
+       var widthbg = c2.width-(c2.width*0.13);//bg w
+       var offset = widthbg*0.03;
+       var  ctxW = c1.width,
+            ctxH= c1.height,
+            x = (c2.width*0.13)+widthbg/2-offset-(commonData.photo.width*ratio/2),
+            y = commonData.footerWZ.y-40;
+          var obj = {
+              x:x,
+              y:y,
+              w:ctxW,
+              h:ctxH
+          }
+       commonData.photoWZ =  Object.assign({},obj)
+    return obj;
+   }
+
+    function getdingwei2(c1){
+        var footerW = c2.width*0.86;
+        var footerH = footerW*1.11
+        var x = (c2.width-footerW)/2
+        var y = c2.height*0.64;
+        var obj = {
+            x:c2.width-footerW,
+            y:c2.height-footerH,
+            w:footerW,
+            h:footerH
+        }
+        commonData.footerWZ =  Object.assign({},obj)
+        return obj;
+    }
+
+
+
+   //输入内容
+    function getinput(){
+        var username = $username.val();
+        var phone = $phone.val();
+        $username2.val(username)
+        $phone2.val(phone)
+        if(!username){
+            alert('姓名不能为空');
+            return false;
+        }
+        if(!phone){
+            alert('联系方式不能为空');
+             return false;
+        }
+        if(!regexps.mobileOrTel.test(phone)){
+             alert('联系方式格式不正确');
+             return false;
+        }
+
+        return true;
+
+    }
+
+    //huatuphotoimg
+    function photoimgCanvas(context){
+        var obj = getdingwei(c1);
+        context.save()
+
+        context.beginPath()
+
+        context.roundRect(obj.x/ratio, obj.y/ratio+40, obj.w/ratio, obj.h/ratio, 98);
+
+        context.clip()
+        context.drawImage(c1,obj.x,obj.y+40*ratio,obj.w,obj.h);
+        context.restore()
+        footertxtCanvas(ctx2)
+
+    }
+
+    function footerimgCanvas(ctx){ //huatu
+        var obj = getdingwei2();
+        ctx.clearRect(obj.x,obj.y,obj.w,obj.h);
+        var img =  new Image();
+        img.onload = function () {
+            ctx.drawImage(img,obj.x,obj.y,obj.w,obj.h);
+            photoimgCanvas(ctx);
+        }
+        img.src = './img/footer2-2.png'
+    }
+
+    function footertxtCanvas(ctx) {//写字
+        var namey = h-50
+        var x= 30;
+        var phoney = h-45
+        var nameval = commonData.name+$username2.val();
+        var phoneval = commonData.phone+$phone2.val()
+        ctx.beginPath();
+        ctx.font= commonData.fontSize1+"px normal Microsoft YaHei";
+        ctx.fillStyle = "#231815";
+        ctx.fillText(nameval,x,namey);
+        ctx.fillText(phoneval,x,phoney+20);
+        ctx.closePath();
+        generateImg();
+    }
+
+    $('#showImgBtn').on('click',function(){//点击生成
+
+         if(!getinput()) return;
+        $('#page1').hide();
+        $("#page2").show();
+
+        if($('#upfile').get(0).files.length==0){
+            initImg('./img/initphoto2.png',function () {
+                $("#page2-main").hide();
+                $(c2).show();
+                card(ctx2,w,h)
+            })
+        } else {
+            $("#page2-main").hide();
+            $(c2).show();
+            card(ctx2,w,h)
+        }
+
+
+    });
+
+
+    $restartBtn.click(function(){
+        $("#page2").hide();
+        $("#page1").show();
+    })
+
+    $shareBtn.click(function(){
+        $("#page2-b").hide();
+        $lowSource.css({
+            width:'100%',
+            padding:'0'
+        }).children('img').css({
+            width:'100%',
+            border:'none'
+        })
+        tishifn("长按保存图片至相册<br>分享至朋友圈");
+    })
+
+
+    tishi.addEventListener('touchstart',function (e) {
+        console.log(e);
+        tishi.style.top = '-100px';
+        tishi.style.display='none';
+    });
+
+
+    function generateImg() {// 生成名片
+        var image = new Image();
+        image.onload=function(){
+            image.width = w;
+            image.height = h;
+            c2.style.display = 'none'
+            image.addEventListener('touchstart',function (e) {
+                console.log(e);
+                tishihide()
+            })
+            $lowSource.html(image);
+            // uploadimg('接口地址',$username2.val())//上传图片
+
+        }
+        image.src = c2.toDataURL("image/png");
+
+    }
+
+    function tishifn(txt) {//
+        tishi.style.display='block';
+        tishi.style.top=(h/2)+'px';
+        $(tishi).html(txt)
+    }
+
+    function tishihide(){
+        tishi.style.top = '-100px';
+        tishi.style.display='none';
+    }
+    tishifn("提示:<br>上传图片可以用手势控制大小旋转");
+
+    setTimeout(function () {
+        tishihide()
+    },3000)
+
+</script>
+</body>
+</html>
