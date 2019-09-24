@@ -26,9 +26,15 @@
         <input id="username" type="text" name="" placeholder="请输入姓名">   
         <input style="margin-top:8px;" id="phone" type="number" name="" placeholder="请输入手机号码"> 
   </div>
+  <div class="page1-c">
+    <input id="networkName" type="text" name="" placeholder="请输入网点名称">   
+    <input id="networkAddress" style="margin-top:8px;" maxlength="20" type="text" name="" placeholder="请输入网点地址"> 
+  </div>
 
   <div class="showImgBtn" id="showImgBtn">生成图片</div>
-    <div style="text-align: center;margin-top: 3px;">注：如不添加照片，默认为模板图片</div>
+    <div style="text-align: center;margin-top: 3px;padding-bottom:30px;">
+       <p>注：如不添加照片，默认为模板图片</p>
+       <p>上传图片可以用手势控制大小旋转</p></div>
 </div>
 
 <div id="page2" class="page2">
@@ -78,6 +84,8 @@
     },2000)
 
     var $username = $("#username"),
+        $networkName = $("#networkName"),
+        $networkAddress = $("#networkAddress"),
         $username2 = $("#username2"),
         $phone =  $("#phone"),
         $phone2 =  $("#phone2"),
@@ -130,9 +138,11 @@
     var commonData = {
         photoWZ:{},
         footerWZ:{},
-        fontSize1:14,
+        fontSize1:12,
         name:'客户经理: ',
-        phone:'联系方式: '
+        phone:'联系方式: ',
+        netwName:"网点名称: ",
+        netwAddress:"网点地址: "
     }
     $("#username").keyup(function() {
 
@@ -199,15 +209,12 @@
   //画图
    function card(ctx,w,h){
            ctx.clearRect(0,0,c2.width,c2.height);
-
            ctx.beginPath();
            ctx.rect(0,0,c2.width,c2.height);
            ctx.fillStyle="white";
            ctx.fill();
            ctx.closePath();
            photoimgCanvas(ctx)
-
-        
    }
 
    //footer-1
@@ -320,7 +327,6 @@
                ctx2.save();
                ctx2.drawImage(img,0,0,c2.width,c2.width*1.786);
                ctx2.restore();
-
            }
            img.src='./img/scard-3.png'
         }
@@ -346,24 +352,55 @@
         ctx.clearRect(obj.x,obj.y,obj.w,obj.h);
         var img =  new Image();
         img.onload = function () {
+            if($networkName.val()!=""&&$networkName.val()!=undefined&&$networkName.val()!=null){
+                obj.y = obj.y -20
+            }
             ctx.drawImage(img,obj.x,obj.y,obj.w,obj.h);
             callback(ctx)
         }
         img.src = './img/sfooter3-2.png'
     }
+    function roundRect(ctx, x, y, w, h, r) {
+        ctx.strokeStyle = "#e40012"
+        ctx.fillStyle = "#e40012";
+        if (w< 2 * r) r = w / 2;
+        if (h < 2 * r) r = h / 2;
+        ctx.beginPath();
+        ctx.moveTo(x + r, y);
+        ctx.arcTo(x + w, y, x + w, y + h, r);
+        ctx.arcTo(x + w, y + h, x, y + h, r);
+        ctx.arcTo(x, y + h, x, y, r);
+        ctx.arcTo(x, y, x + w, y, r);
+        ctx.closePath();
+        ctx.fill()
+        ctx.stroke()
+    }
 
     function footertxtCanvas(ctx) {//写字
         var x = (commonData.footerWZ.x/ratio)+(commonData.footerWZ.w*0.081/ratio);
         var namey = commonData.footerWZ.y/ratio+(commonData.footerWZ.h*0.884/ratio);
-        var phonex = (commonData.footerWZ.x/ratio)+(commonData.footerWZ.w*0.541/ratio);
+        var phonex = (commonData.footerWZ.x/ratio)+(commonData.footerWZ.w*0.45/ratio);
         var nameval = commonData.name+$username2.text();
         var phoneval = commonData.phone+$phone2.text()
+        var netNameval = commonData.netwName + $networkName.val();
+        var netAddressval = commonData.netwAddress + $networkAddress.val()
         ctx.beginPath();
         ctx.font= commonData.fontSize1+"px normal Microsoft YaHei";
         ctx.textAlign="start";
         ctx.fillStyle = "#fff";
-        ctx.fillText(nameval,x,namey);
-        ctx.fillText(phoneval,phonex,namey);
+        if($networkName.val()!=""&&$networkName.val()!=undefined&&$networkName.val()!=null){
+           var namey = commonData.footerWZ.y/ratio+(commonData.footerWZ.h*0.78/ratio);
+           var wh = window.innerWidth/375
+           roundRect(ctx, commonData.footerWZ.x/ratio, namey-25* wh, 375* wh -(commonData.footerWZ.x/ratio)*2-0.5* wh ,58* wh, 18* wh); 
+           ctx.fillStyle = "#fff";
+           ctx.fillText(netNameval,x,namey+4 * wh);
+           ctx.fillText(netAddressval,x,namey + 24* wh);
+           ctx.fillText(nameval,x,namey-14* wh);
+           ctx.fillText(phoneval,phonex,namey-14* wh);
+        }else{
+            ctx.fillText(nameval,x,namey);
+            ctx.fillText(phoneval,phonex,namey);
+        }
         ctx.closePath();
         generateImg();
     }
@@ -404,7 +441,7 @@
         tishi.style.top = '-100px';
         tishi.style.display='none';
     }
-    tishifn("提示:<br>上传图片可以用手势控制大小旋转");
+    // tishifn("提示:<br>上传图片可以用手势控制大小旋转");
 
     setTimeout(function () {
         tishihide()

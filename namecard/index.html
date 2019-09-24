@@ -26,9 +26,14 @@
         <input id="username" type="text" name="" placeholder="请输入姓名">
         <input style="margin-top:2px;" id="phone" type="number" name="" placeholder="请输入手机号码">
     </div>
-
+    <div class="page1-c">
+        <input id="networkName" type="text" name="" placeholder="请输入网点名称">   
+        <input id="networkAddress" style="margin-top:8px;" maxlength="20" type="text" name="" placeholder="请输入网点地址"> 
+      </div>
     <div class="showImgBtn" id="showImgBtn">生成图片</div>
-    <div style="text-align: center;margin-top: 3px;">注：如不添加照片，默认为模板图片</div>
+    <div style="text-align: center;margin-top: 3px;padding-bottom:30px;">
+        <p>注：如不添加照片，默认为模板图片</p>
+        <p>上传图片可以用手势控制大小旋转</p></div>
 </div>
 
 <div id="page2" class="page2">
@@ -77,6 +82,8 @@
 
     var $username = $("#username"),
         $username2 = $("#username2"),
+        $networkName = $("#networkName"),
+        $networkAddress = $("#networkAddress"),
         $phone =  $("#phone"),
         $phone2 =  $("#phone2"),
         $restartBtn = $("#restartBtn"),
@@ -328,9 +335,18 @@
         var y = commonData.footerWZ.y/ratio+25;
         var nameval = commonData.name+$username2.val();
         var phoneval = commonData.phone+$phone2.val()
+        var netNameval = commonData.netwName + $networkName.val();
+        var netAddressval = commonData.netwAddress + $networkAddress.val()
         ctx.beginPath();
         ctx.font= commonData.fontSize1+"px normal Microsoft YaHei";
         ctx.fillStyle = "#fff";
+        if($networkName.val()!=""&&$networkName.val()!=undefined&&$networkName.val()!=null){
+            var wh = window.innerWidth/375
+           var namey = commonData.footerWZ.y/ratio+(commonData.footerWZ.h*0.78/ratio);
+           ctx.fillStyle = "#fff";
+           ctx.fillText(netNameval,phonex,y+45 * wh);
+           ctx.fillText(netAddressval,namex,y + 170 * wh);
+        }
         ctx.fillText(nameval,namex,y);
         ctx.fillText(phoneval,phonex,y);
         ctx.closePath();
@@ -365,7 +381,7 @@
         tishi.style.top = '-100px';
         tishi.style.display='none';
     }
-    tishifn("提示:<br>上传图片可以用手势控制大小旋转");
+    // tishifn("提示:<br>上传图片可以用手势控制大小旋转");
 
     setTimeout(function () {
         tishihide()

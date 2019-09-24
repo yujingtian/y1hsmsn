@@ -109,6 +109,23 @@ body,html {
     -webkit-appearance : none ;
     border: none;
 }
+.page1-c {
+    margin-top: 12px;
+}
+.page1-c input {
+    display: block;
+    outline: none;
+    width: 40%;
+    margin: 0 auto;
+    padding:10px ;
+    border-radius: 20px;
+    background: #b5b5b6;
+    text-align: center;
+    font-size: 14px;
+    color:white;
+    -webkit-appearance : none ;
+    border: none;
+}
 .showImgBtn{
         
     display: block;

@@ -24,12 +24,18 @@
   </div>
 
   <div class="page1-b">
-        <input id="username" type="text" name="" placeholder="请输入姓名">   
-        <input style="margin-top:8px;" id="phone" type="number" name="" placeholder="请输入手机号码"> 
+        <input id="username" type="text" name="" value="哈哈啥" placeholder="请输入姓名">   
+        <input style="margin-top:8px;" id="phone" type="number" value="17826879780" name="" placeholder="请输入手机号码"> 
+  </div>
+  <div class="page1-c">
+    <input id="networkName" value="2131" type="text" name="" placeholder="请输入网点名称">   
+    <input id="networkAddress" style="margin-top:8px;" maxlength="20" type="text" name="" placeholder="请输入网点地址"> 
   </div>
 
   <div class="showImgBtn" id="showImgBtn">生成图片</div>
-    <div style="text-align: center;margin-top: 3px;">注：如不添加照片，默认为模板图片</div>
+  <div style="text-align: center;margin-top: 3px;padding-bottom:30px;">
+    <p>注：如不添加照片，默认为模板图片</p>
+    <p>上传图片可以用手势控制大小旋转</p></div>
 </div>
 
 <div id="page2" class="page2">
@@ -87,6 +93,8 @@
 
     var $username = $("#username"),
         $username2 = $("#username2"),
+        $networkName = $("#networkName"),
+        $networkAddress = $("#networkAddress"),
         $phone =  $("#phone"),
         $phone2 =  $("#phone2"),
         $restartBtn = $("#restartBtn"),
@@ -342,11 +350,22 @@
         var phoney = h-45
         var nameval = commonData.name+$username2.val();
         var phoneval = commonData.phone+$phone2.val()
+        var netNameval = commonData.netwName + $networkName.val();
+        var netAddressval = commonData.netwAddress + $networkAddress.val()
         ctx.beginPath();
         ctx.font= commonData.fontSize1+"px normal Microsoft YaHei";
         ctx.fillStyle = "#231815";
-        ctx.fillText(nameval,x,namey);
-        ctx.fillText(phoneval,x,phoney+20);
+        if($networkName.val()!=""&&$networkName.val()!=undefined&&$networkName.val()!=null){
+           ctx.fillText(netNameval,x,phoney+15*window.innerWidth/375);
+           ctx.fillText(netAddressval,x,phoney + 34*window.innerWidth/375);
+           ctx.fillText(nameval,x,namey-20*window.innerWidth/375);
+            ctx.fillText(phoneval,x,phoney-5*window.innerWidth/375);
+        }else{
+            ctx.fillText(nameval,x,namey-10);
+            ctx.fillText(phoneval,x,phoney+10);
+        }
+
+       
         ctx.closePath();
         generateImg();
     }
@@ -426,7 +445,7 @@
         tishi.style.top = '-100px';
         tishi.style.display='none';
     }
-    tishifn("提示:<br>上传图片可以用手势控制大小旋转");
+    // tishifn("提示:<br>上传图片可以用手势控制大小旋转");
 
     setTimeout(function () {
         tishihide()

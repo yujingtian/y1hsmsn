@@ -5,9 +5,11 @@ var  regexps = {
 var commonData = {
     photoWZ:{},
     footerWZ:{},
-    fontSize1:14,
+    fontSize1:12,
     name:'客户经理: ',
-    phone:'联系方式: '
+    phone:'联系方式: ',
+    netwName:"网点名称: ",
+    netwAddress:"网点地址: "
 }
 
 function isios() {
