@@ -184,12 +184,15 @@ body {
     width: 90px;
 }
 .page2-b {
-    position: absolute;
+    /* position: absolute;
     width: 216px;
     left: 50%;
     margin-left: -108px;
     bottom: 25px;
-    overflow: hidden;
+    overflow: hidden; */
+    width: 100%;
+    text-align: center;
+    margin-top: 30px;
 }
 .page2-b span {
     color:white;
@@ -197,12 +200,12 @@ body {
     padding:4px 15px;
     background: #e60012;
 }
-.page2-b span:first-child {
+/* .page2-b span:first-child {
     float: left;
 }
 .page2-b span:last-child {
     float: right;
-}
+} */
 
 .tishi {
     position: absolute;
