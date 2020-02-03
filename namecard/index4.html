@@ -317,7 +317,8 @@
 
     //huatuphotoimg
     function photoimgCanvas(ctx,obj,callback){
-        ctx.drawImage(c1,obj.x,obj.y,obj.w,obj.h)
+        console.log("c2",c2.width)
+        ctx.drawImage(c1,(c2.width-obj.w)/2,obj.y,obj.w,obj.h)
         var img = new Image();
         img.onload = function(){
             ctx.save();
