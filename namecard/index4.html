@@ -318,7 +318,12 @@
     //huatuphotoimg
     function photoimgCanvas(ctx,obj,callback){
         console.log("c2",c2.width)
-        ctx.drawImage(c1,(c2.width-obj.w)/2,obj.y,obj.w,obj.h)
+        if(window.screen.height/window.screen.width > 2.1){
+            ctx.drawImage(c1,(c2.width-obj.w)/2,obj.y-250,obj.w,obj.h)
+        }else{
+            ctx.drawImage(c1,(c2.width-obj.w)/2,obj.y,obj.w,obj.h)
+        }
+        
         var img = new Image();
         img.onload = function(){
             ctx.save();
