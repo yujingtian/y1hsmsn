@@ -73,7 +73,7 @@
 <script src="./js/hidpi-canvas.min.js"></script>
 <script src="./js/common.js"></script>
 <script>
-    var cardbgsrc = './img/card-4.png';
+    var cardbgsrc = './img/card-quick.png';
     document.querySelector('#username').scrollIntoView();
     document.querySelector('#phone').scrollIntoView();
     document.querySelector('#username2').scrollIntoView();
@@ -281,10 +281,10 @@
            offsetx:w*0.055
        }
        if($('#upfile').get(0).files.length==0){
-           cardbgsrc = './img/card-44.png'
+           cardbgsrc = './img/quickDefault.png'
 
        } else {
-           cardbgsrc = './img/card-4.png'
+           cardbgsrc = './img/card-quick.png'
        }
        commonData.photoWZ.y = commonData.photoWZ.y-60*ratio;
        //card(ctx2,c2.width,c2.height,commonData.photoWZ);
@@ -342,7 +342,7 @@
             ctx.restore();
             callback(ctx)
         }
-        img.src = './img/footer4-1.png'
+        img.src = './img/footer-quick.png'
     }
 
     function footertxtCanvas(ctx) {//写字
