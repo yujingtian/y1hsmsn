@@ -125,7 +125,6 @@
     c2.width = w*ratio;
     c2.height = h*ratio;
     console.log('w',w,'h',h,'ratio',ratio);
-
     divc1.width(PHOTOSIZE.width).height(PHOTOSIZE.height);
 
     $("#username,#username2").keyup(function() {
@@ -281,8 +280,11 @@
            offsetx:w*0.055
        }
        if($('#upfile').get(0).files.length==0){
-           cardbgsrc = './img/quickDefault.png'
-
+           if(window.screen.height/window.screen.width > 2.1){
+                cardbgsrc = './img/quickDefault2.png'
+           }else{
+                cardbgsrc = './img/quickDefault.png'
+           }
        } else {
            cardbgsrc = './img/card-quick.png'
        }
@@ -319,7 +321,7 @@
     function photoimgCanvas(ctx,obj,callback){
         console.log("c2",c2.width)
         if(window.screen.height/window.screen.width > 2.1){
-            ctx.drawImage(c1,(c2.width-obj.w)/2,obj.y-250,obj.w,obj.h)
+            ctx.drawImage(c1,(c2.width-obj.w)/2,obj.y-270,obj.w,obj.h)
         }else{
             ctx.drawImage(c1,(c2.width-obj.w)/2,obj.y,obj.w,obj.h)
         }
